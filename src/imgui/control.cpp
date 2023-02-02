@@ -1,10 +1,14 @@
+module;
+
+#include "glad/glad.h"
+#include "GLFW/glfw3.h"
+
 module imcpp.control;
 
 namespace imcpp {
 
-    ImScopedFrame::ImScopedFrame(const WindowGetCallback& winCallback, const WindowSizeCallback& sizeCallback, const ContextGetCallback& ctxGetCallback, const ContextSetCallback& ctxSetCallback)
-        : mWindowGetCallback(winCallback), mWindowSizeCallback(sizeCallback),
-          mContextGetCallback(ctxGetCallback), mContextSetCallback(ctxSetCallback)
+    ImScopedFrame::ImScopedFrame(const WindowSizeCallback& sizeCallback)
+        : mWindowSizeCallback(sizeCallback)
     {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
@@ -22,16 +26,15 @@ namespace imcpp {
 
         if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
         {
-            void* backupContext = mContextGetCallback();
+            GLFWwindow* backupContext = glfwGetCurrentContext();
             ImGui::UpdatePlatformWindows();
             ImGui::RenderPlatformWindowsDefault();
-            mContextSetCallback(backupContext);
+            glfwMakeContextCurrent(backupContext);
         }
     }
 
-	ImHandler::ImHandler(WindowGetCallback&& winCallback, WindowSizeCallback&& sizeCallback, ContextGetCallback&& ctxGetCallback, ContextSetCallback&& ctxSetCallback)
-		: mWindowGetCallback(std::move(winCallback)), mWindowSizeCallback(std::move(sizeCallback)), 
-          mContextGetCallback(std::move(ctxGetCallback)), mContextSetCallback(std::move(ctxSetCallback))
+	ImHandler::ImHandler(WindowGetCallback&& winCallback, WindowSizeCallback&& sizeCallback)
+		: mWindowGetCallback(std::move(winCallback)), mWindowSizeCallback(std::move(sizeCallback))
 	{
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
