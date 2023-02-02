@@ -5,9 +5,21 @@ export import imcpp.std;
 
 namespace imcpp {
 
+	template<typename T>
+	concept ImVecType = std::same_as<T, ImVec2> || std::same_as<T, ImVec3> || std::same_as<T, ImVec4>;
+
+	template<typename T, typename V>
+	concept VecSized = requires { sizeof(T) == sizeof(V); };
+
 	export class Utils 
 	{
 	public:
+		template<ImVecType Vec, typename T> requires VecSized<Vec, T>
+		static const Vec& ToImVec(const T& var) { return (Vec*)&var; }
+
+		template<ImVecType Vec, typename T> requires VecSized<Vec, T>
+		static const T& FromImVec(const Vec& var) { return (T*)&var; }
+
 		static bool IsMouseDown(ImGuiMouseButton button);
 		static bool IsMouseReleased(ImGuiMouseButton button);
 
