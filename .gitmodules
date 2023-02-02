@@ -1,4 +1,4 @@
 [submodule "dependencies/imgui"]
 	path = dependencies/imgui
 	url = git@github.com:amayesingnathan/imgui.git
-	branch = modules
+	branch = docking
