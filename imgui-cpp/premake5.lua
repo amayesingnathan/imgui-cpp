@@ -22,6 +22,7 @@ project "imgui-cpp"
     includedirs
     {
         "%{IncludeDir.imguicpp}",
+        "%{IncludeDir.imgui}",
     }
 
 	links

@@ -26,5 +26,6 @@ outputDir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 IncludeDir = {}
 IncludeDir["imguicpp"] 	= "%{wks.location}/imgui-cpp/src"
+IncludeDir["imgui"] 	= "%{wks.location}/imgui-cpp/dependencies/imgui"
 
 include "imgui-cpp"
