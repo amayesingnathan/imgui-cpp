@@ -28,6 +28,9 @@ IncludeDir = {}
 IncludeDir["imguicpp"] 	= "%{wks.location}/imgui-cpp/src"
 IncludeDir["imgui"] 	= "%{wks.location}/dependencies/imgui"
 
+group "Dependencies"
+	include "dependencies/imgui"
+group ""
 
 project "imgui-cpp"
     language "C++"
@@ -52,12 +55,13 @@ project "imgui-cpp"
 
     includedirs
     {
-        "%{IncludeDir.imguicpp}",
+        "src",
         "%{IncludeDir.imgui}",
     }
 
 	links
 	{
+		"imgui"
 	}
 	
     filter { "files:**.hxx" }
