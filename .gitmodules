@@ -5,6 +5,3 @@
 [submodule "dependencies/glfw"]
 	path = dependencies/glfw
 	url = git@github.com:amayesingnathan/glfw.git
-[submodule "dependencies/glad"]
-	path = dependencies/glad
-	url = git@github.com:amayesingnathan/glad.git
