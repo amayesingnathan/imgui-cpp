@@ -1,38 +1,5 @@
-workspace "imgui-cpp"
-
-    configurations 
-    { 
-        "Debug",
-        "Release"
-    }
-    
-    platforms
-    {
-        "x64",
-        "ARM32",
-        "ARM64"
-    }
-
-	filter "platforms:x64"
-		architecture "x86_64"
-
-	filter "platforms:ARM32"
-		architecture "ARM"
-
- 	filter "configurations:ARM64"
-		architecture "ARM64"
-
-outputDir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
-
-IncludeDir = {}
-IncludeDir["imguicpp"] 	= "%{wks.location}/imgui-cpp/src"
-IncludeDir["imgui"] 	= "%{wks.location}/dependencies/imgui"
-IncludeDir["glfw"] 	= "%{wks.location}/dependencies/glfw/include"
-
-group "Dependencies"
-	include "dependencies/imgui"
-	include "dependencies/glfw"
-group ""
+include "dependencies/imgui"
+include "dependencies/glfw"
 
 project "imgui-cpp"
     language "C++"
@@ -55,16 +22,11 @@ project "imgui-cpp"
 		"_CRT_SECURE_NO_WARNINGS"
 	}
 
-<<<<<<< Updated upstream
-=======
-	IncludeDir["imgui"] 	= "%{prj.location}/dependencies/imgui"
-	IncludeDir["glfw"] 	= "%{prj.location}/dependencies/glfw/include"
->>>>>>> Stashed changes
     includedirs
     {
         "src",
-        "%{IncludeDir.imgui}",
-        "%{IncludeDir.glfw}",
+        "dependencies/glfw/include",
+        "dependencies/imgui",
     }
 
 	links
