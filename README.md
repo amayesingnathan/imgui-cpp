@@ -1,29 +1,26 @@
-# cpp-template
+# imgui-cpp
 
-Basic C++ project template using premake5.
+A modern C++ wrapper around Dear ImGui widgets.
 
 ## Description
 
-This is a basic template for a C++ project, using premake as a build system. The template comes with basic premake template projects, and when the 
-set up script is run premake will be downloaded and project files will be generated if there have been any changes to the premake or source files.
+This is a wrapper around Dear ImGui widgets written using C++20. Not only does it use C++20 modules, resulting in faster build times, but also provides
+more type safe abstractions around certain widgets using templates and concepts. 
 
-The first time that the setup script is run, the user is prompted to supply the name for the workspace and starting template project. 
-The repo directory will still need to be renamed manually as sometimes the permissions for this can be restricted.
+imgui-cpp uses the master branch of imgui, but does not export it as part of the main imcpp module. This means it is required to link your own version, but means that different branches
+should be possible to use as imgui-cpp does not depend on anything other than core ImGui features.
 
 ## Getting Started
 
 ### Dependencies
 
-* Python3
+* Dear ImGui - Internal dependency but is not exported so is required in your own project as the API used ImGui types and typedefs.
+* Python3 - Used for setup scripts
 * premake5 - Will be downloaded and extracted as a binary when the setup script is run if it is not found.
-* Currently only supports Windows and Linux (Ubuntu tested).
 
 ### Installing
 
-* Clone the repo and run `setup.bat` for Windows or `setup.sh` for Linux. 
-* Enter the name for the solution and the starting project.
-* Project files will be generated for the target platform to use.
-* Extend the project as desired!
+* Clone the repo recursively and run `setup.bat` for Windows or `setup.sh` for Linux.
 
 ## License
 
