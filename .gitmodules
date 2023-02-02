@@ -2,3 +2,6 @@
 	path = dependencies/imgui
 	url = git@github.com:amayesingnathan/imgui.git
 	branch = docking
+[submodule "dependencies/glfw"]
+	path = dependencies/glfw
+	url = git@github.com:amayesingnathan/glfw.git
