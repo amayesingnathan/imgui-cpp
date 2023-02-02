@@ -27,10 +27,12 @@ outputDir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 IncludeDir = {}
 IncludeDir["imguicpp"] 	= "%{wks.location}/imgui-cpp/src"
 IncludeDir["imgui"] 	= "%{wks.location}/dependencies/imgui"
+IncludeDir["glad"] 	= "%{wks.location}/dependencies/glad/include"
 IncludeDir["glfw"] 	= "%{wks.location}/dependencies/glfw/include"
 
 group "Dependencies"
 	include "dependencies/imgui"
+	include "dependencies/glad"
 	include "dependencies/glfw"
 group ""
 
@@ -59,12 +61,14 @@ project "imgui-cpp"
     {
         "src",
         "%{IncludeDir.imgui}",
+        "%{IncludeDir.glad}",
         "%{IncludeDir.glfw}",
     }
 
 	links
 	{
 		"imgui",
+		"glad",
 		"glfw",
 	}
     
