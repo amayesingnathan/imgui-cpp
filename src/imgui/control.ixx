@@ -14,14 +14,15 @@ export namespace imcpp {
 	class ImScopedFrame
 	{
 	public:
+		ImScopedFrame() = delete;
 		explicit ImScopedFrame(const WindowSizeCallback& sizeCallback);
 		~ImScopedFrame();
 
 		ImScopedFrame(const ImScopedFrame&) = delete;
 		ImScopedFrame& operator=(const ImScopedFrame&) = delete;
 
-		ImScopedFrame(ImScopedFrame&&) = default;
-		ImScopedFrame& operator=(ImScopedFrame&&) = default;
+		ImScopedFrame(ImScopedFrame&&) noexcept = delete;
+		ImScopedFrame& operator=(ImScopedFrame&&) noexcept = delete;
 
 	private:
 		const WindowSizeCallback& mWindowSizeCallback;
@@ -30,10 +31,21 @@ export namespace imcpp {
 	class ImHandler
 	{
 	public:
+		ImHandler() = delete;
 		ImHandler(WindowGetCallback&& winCallback, WindowSizeCallback&& sizeCallback);
 		~ImHandler();
 
+		ImHandler(const ImHandler&) = delete;
+		ImHandler& operator=(const ImHandler&) = delete;
+
+		ImHandler(ImHandler&&) = delete;
+		ImHandler& operator=(ImHandler&&) = delete;
+
+		// On the stack as every frame.
 		[[nodiscard]] ImScopedFrame newFrame() const { return ImScopedFrame(mWindowSizeCallback); }
+
+	private:
+		void SetDarkThemeColours();
 
 	private:
 		WindowGetCallback mWindowGetCallback;
