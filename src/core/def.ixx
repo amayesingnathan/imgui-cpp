@@ -14,4 +14,11 @@ export namespace imcpp {
 	using Predicate = Func<bool, T...>;
 
 	namespace fs = std::filesystem;
+
+	template<typename T>
+	struct Limits
+	{
+		static constexpr T Min = std::numeric_limits<T>::min();
+		static constexpr T Max = std::numeric_limits<T>::max();
+	};
 }

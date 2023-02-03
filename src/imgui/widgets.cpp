@@ -770,18 +770,18 @@ namespace imcpp {
 		return ImGui::BeginCombo(label.data(), preview.data());
 	}
 
-	const IComboEntry* Widgets::ComboboxEntry(std::string_view preview, const IComboEntry* entry)
+	bool Widgets::ComboboxEntry(std::string_view preview, const IComboEntry* entry)
 	{
-		const IComboEntry* result = nullptr;
-		bool isSelected = entry->key == preview;
+		bool selectionChange = false;
 
+		bool isSelected = entry->key == preview;
 		if (ImGui::Selectable(entry->key.data(), isSelected))
-			result = entry;
+			selectionChange = true;
 
 		if (isSelected)
 			ImGui::SetItemDefaultFocus();
 
-		return result;
+		return selectionChange;
 	}
 
 	void Widgets::EndCombo()

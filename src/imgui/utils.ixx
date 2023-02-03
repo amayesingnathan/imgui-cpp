@@ -8,8 +8,8 @@ namespace imcpp {
 	template<typename T>
 	concept ImVecType = std::same_as<T, ImVec2> || std::same_as<T, ImVec3> || std::same_as<T, ImVec4>;
 
-	template<typename T, typename V>
-	concept VecSized = requires { sizeof(T) == sizeof(V); };
+	template<typename V, typename T>
+	concept VecSized = requires { sizeof(V) == sizeof(T); };
 
 	export class Utils 
 	{

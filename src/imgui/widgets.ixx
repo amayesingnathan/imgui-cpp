@@ -135,7 +135,7 @@ namespace imcpp {
 		template<typename T>
 		static void AddDragDropSource(std::string_view strID, const T& data)
 		{
-			DragDropSourceInternal(strID, [&]() { sCurrentPayload = MakeSingle<Payload<T>>(data); });
+			DragDropSourceInternal(strID, [&sCurrentPayload]() { sCurrentPayload = MakeSingle<Payload<T>>(data); });
 		}
 		template<typename T>
 		static void AddDragDropTarget(std::string_view strID, Action<const T&> response)
@@ -155,58 +155,52 @@ namespace imcpp {
 		static void Button(std::string_view label, Action<> action = {});
 		static void Button(std::string_view label, const ImVec2& size, Action<> action = {});
 
-		template<typename T>
+		template<typename T> requires std::copy_constructible<T>
 		static void Combobox(std::string_view label, std::string_view preview, T& value, std::span<const ComboEntry<T>> table)
 		{
 			if (!BeginCombo(label, preview))
 				return;
 
-			// Convert span of entries to base class view and display each entry and return value if item selected.
+			// Convert span of entries to view of base classes
+			auto baseTable = table | std::views::transform([](const ComboEntry<T>& entry) { return dynamic_cast<const IComboEntry*>(&entry); });
+
 			const IComboEntry* comboEntry = nullptr;
-			std::ranges::for_each(table | std::views::transform([](const ComboEntry<T>& entry) { return dynamic_cast<const IComboEntry*>(&entry); }),
-				[=, &comboEntry](const IComboEntry* entry)
-				{
-					const IComboEntry* result = Widgets::ComboboxEntry(preview, entry);
-			comboEntry = result ? result : comboEntry;
-				});
+			for (const IComboEntry* entry : baseTable)
+			{
+				if (Widgets::ComboboxEntry(preview, entry))
+					comboEntry = entry;
+			}
 
 			EndCombo();
 
 			if (!comboEntry)
 				return;
 
-			const void* comboValue = comboEntry->getVal();
-			if (!comboValue)
-				return;
-
-			value = T(*(const T*)comboValue);
+			value = T(*(const T*)comboEntry->getVal());
 		}
 
-		template<typename T, typename Func>
-		static void Combobox(std::string_view label, std::string_view preview, T value, std::span<const ComboEntry<T>> table, Func onEdit)
+		template<typename T>
+		static void Combobox(std::string_view label, std::string_view preview, T value, std::span<const ComboEntry<T>> table, Action<std::string_view, const T&> onSelection)
 		{
 			if (!BeginCombo(label, preview))
 				return;
 
-			// Convert span of entries to base class view and display each entry and return value if item selected.
+			// Convert span of entries to view of base classes
+			auto baseTable = table | std::views::transform([](const ComboEntry<T>& entry) { return dynamic_cast<const IComboEntry*>(&entry); });
+
 			const IComboEntry* comboEntry = nullptr;
-			std::ranges::for_each(table | std::views::transform([](const ComboEntry<T>& entry) { return dynamic_cast<const IComboEntry*>(&entry); }),
-			[=, &comboEntry](const IComboEntry* entry)
+			for (const IComboEntry* entry : baseTable)
 			{
-				const IComboEntry* result = Widgets::ComboboxEntry(preview, entry);
-				comboEntry = result ? result : comboEntry;
-			});
+				if (Widgets::ComboboxEntry(preview, entry))
+					comboEntry = entry;
+			}
 
 			EndCombo();
 
 			if (!comboEntry)
 				return;
 
-			const void* comboValue = comboEntry->getVal();
-			if (!comboValue)
-				return;
-
-			onEdit(comboEntry->key, *(const T*)comboValue);
+			onEdit(comboEntry->key, *(const T*)comboEntry->getVal());
 		}
 
 	private:
@@ -221,7 +215,7 @@ namespace imcpp {
 		static void* DragDropTargetInternal(std::string_view strID);
 
 		static bool BeginCombo(std::string_view label, std::string_view preview);
-		static const IComboEntry* ComboboxEntry(std::string_view preview, const IComboEntry* entry);
+		static bool ComboboxEntry(std::string_view preview, const IComboEntry* entry);
 		static void EndCombo();
 
 	private:
