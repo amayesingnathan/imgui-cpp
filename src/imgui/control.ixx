@@ -41,8 +41,6 @@ export namespace imcpp {
 		ImHandler(ImHandler&&) = delete;
 		ImHandler& operator=(ImHandler&&) = delete;
 
-		void blockEvents(bool block) { mBlockEvents = block; }
-
 		// On the stack as every frame.
 		[[nodiscard]] ImScopedFrame newFrame() const { return ImScopedFrame(mWindowSizeCallback); }
 
@@ -50,8 +48,6 @@ export namespace imcpp {
 		void SetDarkThemeColours();
 
 	private:
-		bool mBlockEvents = true;
-
 		WindowGetCallback mWindowGetCallback;
 		WindowSizeCallback mWindowSizeCallback;
 	};
