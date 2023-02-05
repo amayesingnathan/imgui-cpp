@@ -16,9 +16,19 @@ namespace imcpp {
 		return ImGui::IsMouseReleased(button);
 	}
 
-	ImVec2 Utils::CursorPos()
+	ImVec2 Utils::CursorPosInternal()
 	{
 		return ImGui::GetCursorPos();
+	}
+
+	ImVec2 Utils::MousePosInternal()
+	{
+		return ImGui::GetMousePos();
+	}
+
+	ImVec2 Utils::WindowPosInternal()
+	{
+		return ImGui::GetWindowPos();
 	}
 
 	void Utils::SetCursorPos(float x, float y)
@@ -34,6 +44,16 @@ namespace imcpp {
 	void Utils::SetCursorPosY(float pos)
 	{
 		ImGui::SetCursorPosY(pos);
+	}
+
+	void Utils::SetNextWindowSizeInternal(const ImVec2& size, ImGuiCond cond)
+	{
+		ImGui::SetNextWindowSize(size, cond);
+	}
+
+	void Utils::SetNextWindowPosInternal(const ImVec2& size, const ImVec2& pivot, ImGuiCond cond)
+	{
+		ImGui::SetNextWindowPos(size, cond, pivot);
 	}
 
 	void Utils::SetButtonTransparent()
@@ -52,12 +72,28 @@ namespace imcpp {
 		ImGui::PopStyleColor(3);
 	}
 
-	ImVec2 Utils::AvailableRegion()
+	ImVec2 Utils::GetMainWindowCentreInternal()
+	{
+		return ImGui::GetMainViewport()->GetCenter();
+	}
+
+	void Utils::SetWindowMoveFromTitleBar(bool titleBarOnly)
+	{
+		ImGuiIO& io = ImGui::GetIO();
+		io.ConfigWindowsMoveFromTitleBarOnly = titleBarOnly;
+	}
+
+	ImVec2 Utils::AvailableRegionInternal()
 	{
 		return ImGui::GetContentRegionAvail();
 	}
 
-	ImVec2 Utils::AvailableRegionMax()
+	ImVec2 Utils::AvailableRegionMinInternal()
+	{
+		return ImGui::GetWindowContentRegionMin();
+	}
+
+	ImVec2 Utils::AvailableRegionMaxInternal()
 	{
 		return ImGui::GetWindowContentRegionMax();
 	}
@@ -67,7 +103,7 @@ namespace imcpp {
 		return GImGui->Font->FontSize;
 	}
 
-	ImVec2 Utils::FramePadding()
+	ImVec2 Utils::FramePaddingInternal()
 	{
 		return GImGui->Style.FramePadding;
 	}
@@ -90,6 +126,16 @@ namespace imcpp {
 	float Utils::WindowHeight()
 	{
 		return ImGui::GetWindowHeight();
+	}
+
+	bool Utils::WindowFocused()
+	{
+		return ImGui::IsWindowFocused();
+	}
+
+	bool Utils::WindowHovered()
+	{
+		return ImGui::IsWindowHovered();
 	}
 
 	void Utils::PushItemWidth(float width)

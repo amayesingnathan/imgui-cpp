@@ -41,27 +41,64 @@ namespace imcpp {
 		ImGui::SetCursorPosY(pos);
 	}
 
-	void Widgets::GridControl(const ImVec2& pos, const ImVec2& size, size_t width, size_t height, GridFunction func)
+	void Widgets::BeginDockspace()
 	{
-		ImGui::SetCursorPos(pos);
-		GridControl(size, width, height, func);
+		static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
+		static bool dockspaceOpen = true;
+		static bool opt_fullscreen_persistant = true;
+		bool opt_fullscreen = opt_fullscreen_persistant;
+
+		ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
+		if (opt_fullscreen)
+		{
+			ImGuiViewport* viewport = ImGui::GetMainViewport();
+			ImGui::SetNextWindowPos(viewport->Pos);
+			ImGui::SetNextWindowSize(viewport->Size);
+			ImGui::SetNextWindowViewport(viewport->ID);
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+			window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+			window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+		}
+
+		if (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode)
+			window_flags |= ImGuiWindowFlags_NoBackground;
+
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+		ImGui::Begin("DockSpace Demo", &dockspaceOpen, window_flags);
+		ImGui::PopStyleVar();
+
+		if (opt_fullscreen)
+			ImGui::PopStyleVar(2);
+
+		// DockSpace
+		ImGuiIO& io = ImGui::GetIO();
+		ImGuiStyle& style = ImGui::GetStyle();
+		float minWinSizeX = style.WindowMinSize.x;
+		style.WindowMinSize.x = 370.0f;
+
+		if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
+		{
+			ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
+			ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
+		}
+
+		style.WindowMinSize.x = minWinSizeX;
 	}
 
-	void Widgets::GridControl(const ImVec2& size, size_t width, size_t height, GridFunction func)
+	void Widgets::EndDockspace()
 	{
-		ImVec2 pos = ImGui::GetCursorPos();
-		ImVec2 tileSize = { size.x / width, size.y / height };
+		ImGui::End();
+	}
 
-		for (uint32_t y = 0; y < width; y++)
-		{
-			for (uint32_t x = 0; x < height; x++)
-			{
-				ImGui::SetCursorPosX(pos.x + ((float)x * tileSize.x));
-				ImGui::SetCursorPosY(pos.y + ((float)y * tileSize.y));
+	bool Widgets::BeginWindow(std::string_view heading, bool* open, ImGuiWindowFlags flags)
+	{
+		return ImGui::Begin(heading.data(), open, flags);
+	}
 
-				func({ x, y }, tileSize);
-			}
-		}
+	void Widgets::EndWindow()
+	{
+		ImGui::End();
 	}
 
 	void Widgets::BeginColumns(int count, bool border)
@@ -79,7 +116,7 @@ namespace imcpp {
 		ImGui::Columns(1);
 	}
 
-	void Widgets::BeginChild(std::string_view strID, const ImVec2& size, bool border)
+	void Widgets::BeginChildInternal(std::string_view strID, const ImVec2& size, bool border)
 	{
 		ImGui::BeginChild(strID.data(), size);
 	}
@@ -102,6 +139,11 @@ namespace imcpp {
 	void Widgets::TreeNode(void* id, std::string_view text, bool selected, Action<> whileOpen)
 	{
 		TreeNodeInternal(id, text, selected, ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth, whileOpen);
+	}
+
+	bool Widgets::TreeNodeEx(void* id, std::string_view text, ImGuiTreeNodeFlags flags)
+	{
+		return ImGui::TreeNodeEx(id, flags, text.data());
 	}
 
 	void Widgets::Selectable(std::string_view label, bool selected, Action<> action)
@@ -272,7 +314,7 @@ namespace imcpp {
 			action();
 	}
 
-	void Widgets::Button(std::string_view label, const ImVec2& size, Action<> action)
+	void Widgets::ButtonInternal(std::string_view label, const ImVec2& size, Action<> action)
 	{
 		if (ImGui::Button(label.data(), size) && action)
 			action();
@@ -306,7 +348,7 @@ namespace imcpp {
 		field = (double)tmp;
 	}
 
-	void Widgets::Vector2Edit(std::string_view label, ImVec2& values, float resetVal, float colWidth)
+	void Widgets::Vector2EditInternal(std::string_view label, ImVec2& values, float resetVal, float colWidth)
 	{
 		ImGuiIO& io = ImGui::GetIO();
 		auto boldFont = io.Fonts->Fonts[0];
@@ -358,7 +400,7 @@ namespace imcpp {
 		ImGui::PopID();
 	}
 
-	void Widgets::Vector3Edit(std::string_view label, ImVec3& values, float resetVal, float colWidth)
+	void Widgets::Vector3EditInternal(std::string_view label, ImVec3& values, float resetVal, float colWidth)
 	{
 		ImGuiIO& io = ImGui::GetIO();
 		auto boldFont = io.Fonts->Fonts[0];
@@ -424,7 +466,7 @@ namespace imcpp {
 		ImGui::PopID();
 	}
 
-	void Widgets::Vector4Edit(std::string_view label, ImVec4& values, float resetVal, float colWidth)
+	void Widgets::Vector4EditInternal(std::string_view label, ImVec4& values, float resetVal, float colWidth)
 	{
 		ImGuiIO& io = ImGui::GetIO();
 		auto boldFont = io.Fonts->Fonts[0];
@@ -504,7 +546,7 @@ namespace imcpp {
 		ImGui::PopID();
 	}
 
-	void Widgets::Vector2Edit(std::string_view label, ImVec2 values, Action<const ImVec2&> onEdit, float resetVal, float colWidth)
+	void Widgets::Vector2EditInternal(std::string_view label, ImVec2 values, Action<const ImVec2&> onEdit, float resetVal, float colWidth)
 	{
 		ImVec2 tmp = values;
 
@@ -561,7 +603,7 @@ namespace imcpp {
 			onEdit(values);
 	}
 
-	void Widgets::Vector3Edit(std::string_view label, ImVec3 values, Action<const ImVec3&> onEdit, float resetVal, float colWidth)
+	void Widgets::Vector3EditInternal(std::string_view label, ImVec3 values, Action<const ImVec3&> onEdit, float resetVal, float colWidth)
 	{
 		ImVec3 tmp = values;
 
@@ -632,7 +674,7 @@ namespace imcpp {
 			onEdit(values);
 	}
 
-	void Widgets::Vector4Edit(std::string_view label, ImVec4 values, Action<const ImVec4&> onEdit, float resetVal, float colWidth)
+	void Widgets::Vector4EditInternal(std::string_view label, ImVec4 values, Action<const ImVec4&> onEdit, float resetVal, float colWidth)
 	{
 		ImVec4 tmp = values;
 
@@ -717,17 +759,17 @@ namespace imcpp {
 			onEdit(values);
 	}
 
-	void Widgets::ColourEdit(std::string_view label, ImVec4& colour)
+	void Widgets::ColourEditInternal(std::string_view label, ImVec4& colour)
 	{
 		ImGui::ColorEdit4(label.data(), &colour.x);
 	}
 
-	void Widgets::Image(ImTextureID image, const ImVec2& size, float rotation, const ImVec2& uv0, const ImVec2& uv1)
+	void Widgets::ImageInternal(ImTextureID image, const ImVec2& size, float rotation, const ImVec2& uv0, const ImVec2& uv1)
 	{
 		ImGui::Image(image, size, uv0, uv1);
 	}
 
-	void Widgets::ImageButton(ImTextureID image, const ImVec2& size, Action<> action, const ImVec2& uv0, const ImVec2& uv1, int padding)
+	void Widgets::ImageButtonInternal(ImTextureID image, const ImVec2& size, Action<> action, const ImVec2& uv0, const ImVec2& uv1, int padding)
 	{
 		if (ImGui::ImageButton(image, size, uv0, uv1, padding) && action)
 			action();

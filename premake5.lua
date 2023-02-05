@@ -55,6 +55,11 @@ project "imgui-cpp"
 		"_CRT_SECURE_NO_WARNINGS"
 	}
 
+<<<<<<< Updated upstream
+=======
+	IncludeDir["imgui"] 	= "%{prj.location}/dependencies/imgui"
+	IncludeDir["glfw"] 	= "%{prj.location}/dependencies/glfw/include"
+>>>>>>> Stashed changes
     includedirs
     {
         "src",

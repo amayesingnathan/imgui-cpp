@@ -3,17 +3,20 @@ export module imcpp.widgets;
 import <imgui.h>;
 
 import imcpp.def;
-import imcpp.utils;
+export import imcpp.utils;
 import imcpp.containers;
 
-import imcpp.widgets.combobox;
+export import imcpp.widgets.combobox;
 import imcpp.widgets.payload;
 import imcpp.widgets.menubar;
 import imcpp.widgets.popup;
 
-namespace imcpp {
+export namespace imcpp {
+
+	template<typename T> requires VecSized<ImVec2, T>
+	using GridFunction = std::function<void(uint32_t x, uint32_t y, const T&)>;
 	
-	export class Widgets
+	class Widgets
 	{
 	public:
 		static void NewLine();
@@ -26,21 +29,49 @@ namespace imcpp {
 		static void SetXPosition(float pos);
 		static void SetYPosition(float pos);
 
-		using GridFunction = std::function<void(const GridPosition&, const ImVec2&)>;
-		static void GridControl(const ImVec2& pos, const ImVec2& size, size_t width, size_t height, GridFunction func);
-		static void GridControl(const ImVec2& size, size_t width, size_t height, GridFunction func);
+		static void BeginDockspace();
+		static void EndDockspace();
 
-		static void BeginColumns(int count, bool border = false);
-		static void NextColumn();
-		static void EndColumns();
+		static bool BeginWindow(std::string_view heading, bool* open = nullptr, ImGuiWindowFlags flags = 0);
+		static void EndWindow();
 
-		static void BeginChild(std::string_view strID, const ImVec2& size = { 0.0f, 0.0f }, bool border = true);
+		template<typename T = ImCppVec2> requires VecSized<ImVec2, T> && requires (T a) { T(0, 0); }
+		static void BeginChild(std::string_view strID, const T& size = T(0, 0), bool border = true) { BeginChildInternal(strID, Utils::ToImVec<ImVec2>(size), border); }
 		static void EndChild();
 
 		static void BeginGroup();
 		static void EndGroup();
 
+		template<typename T> requires VecSized<ImVec2, T>
+		static void GridControl(const T& pos, const T& size, size_t width, size_t height, GridFunction<T> func)
+		{
+			ImGui::SetCursorPos(Utils::ToImVec<ImVec2>(pos));
+			Widgets::GridControl<T>(size, width, height, func);
+		}
+		template<typename T> requires VecSized<ImVec2, T>
+		static void GridControl(const T& size, size_t width, size_t height, GridFunction<T> func)
+		{
+			ImVec2 pos = ImGui::GetCursorPos();
+			ImVec2 tileSize = { size.x / width, size.y / height };
+
+			for (uint32_t y = 0; y < width; y++)
+			{
+				for (uint32_t x = 0; x < height; x++)
+				{
+					ImGui::SetCursorPosX(pos.x + ((float)x * tileSize.x));
+					ImGui::SetCursorPosY(pos.y + ((float)y * tileSize.y));
+
+					func(x, y, Utils::FromImVec<T>(tileSize));
+				}
+			}
+		}
+
+		static void BeginColumns(int count, bool border = false);
+		static void NextColumn();
+		static void EndColumns();
+
 		static void TreeNode(void* id, std::string_view text, bool selected, Action<> whileOpen);
+		static bool TreeNodeEx(void* id, std::string_view text, ImGuiTreeNodeFlags flags);
 
 		static void Selectable(std::string_view label, bool selected, Action<> action);
 
@@ -120,22 +151,42 @@ namespace imcpp {
 		static void DoubleEdit(std::string_view label, double& field, float speed = 1.0f, float mix = 0.0f, float max = 0.0f);
 		static void DoubleEdit(std::string_view label, double field, Action<double> onEdit, float speed = 1.0f, float mix = 0.0f, float max = 0.0f);
 
-		static void Vector2Edit(std::string_view label, ImVec2& values, float resetVal = 0.0f, float colWidth = 100.0f);
-		static void Vector3Edit(std::string_view label, ImVec3& values, float resetVal = 0.0f, float colWidth = 100.0f);
-		static void Vector4Edit(std::string_view label, ImVec4& values, float resetVal = 0.0f, float colWidth = 100.0f);
-		static void Vector2Edit(std::string_view label, ImVec2 values, Action<const ImVec2&> onEdit, float resetVal = 0.0f, float colWidth = 100.0f);
-		static void Vector3Edit(std::string_view label, ImVec3 values, Action<const ImVec3&> onEdit, float resetVal = 0.0f, float colWidth = 100.0f);
-		static void Vector4Edit(std::string_view label, ImVec4 values, Action<const ImVec4&> onEdit, float resetVal = 0.0f, float colWidth = 100.0f);
+		template<typename T> requires VecSized<ImVec2, T>
+		static void Vector2Edit(std::string_view label, T& values, float resetVal = 0.0f, float colWidth = 100.0f) { Vector2EditInternal(label, Utils::ToImVec<ImVec2>(values), resetVal, colWidth); }
+		template<typename T> requires VecSized<ImVec3, T>
+		static void Vector3Edit(std::string_view label, T& values, float resetVal = 0.0f, float colWidth = 100.0f) { Vector3EditInternal(label, Utils::ToImVec<ImVec3>(values), resetVal, colWidth); }
+		template<typename T> requires VecSized<ImVec4, T>
+		static void Vector4Edit(std::string_view label, T& values, float resetVal = 0.0f, float colWidth = 100.0f) { Vector4EditInternal(label, Utils::ToImVec<ImVec4>(values), resetVal, colWidth); }
+		template<typename T> requires VecSized<ImVec2, T>
+		static void Vector2Edit(std::string_view label, T values, Action<const ImVec2&> onEdit, float resetVal = 0.0f, float colWidth = 100.0f) { Vector2EditInternal(label, Utils::ToImVec<ImVec2>(values), onEdit, resetVal, colWidth); }
+		template<typename T> requires VecSized<ImVec3, T>
+		static void Vector3Edit(std::string_view label, T values, Action<const ImVec3&> onEdit, float resetVal = 0.0f, float colWidth = 100.0f) { Vector3EditInternal(label, Utils::ToImVec<ImVec3>(values), onEdit, resetVal, colWidth); }
+		template<typename T> requires VecSized<ImVec4, T>
+		static void Vector4Edit(std::string_view label, T values, Action<const ImVec4&> onEdit, float resetVal = 0.0f, float colWidth = 100.0f) { Vector4EditInternal(label, Utils::ToImVec<ImVec4>(values), onEdit, resetVal, colWidth); }
 
-		static void ColourEdit(std::string_view label, ImVec4& colour);
+		template<typename T> requires VecSized<ImVec4, T>
+		static void ColourEdit(std::string_view label, T& colour) { ColourEditInternal(label, Utils::ToImVec<ImVec4>(colour)); }
 
-		static void Image(ImTextureID image, const ImVec2& size, float rotation = 0.0f, const ImVec2& uv0= { 0.0f, 0.0f }, const ImVec2& uv1= { 1.0f, 1.0f });
-		static void ImageButton(ImTextureID image, const ImVec2& size, Action<> action = {}, const ImVec2& uv0 = { 0.0f, 0.0f }, const ImVec2& uv1 = { 1.0f, 1.0f }, int padding = -1);
+		template<typename T> requires VecSized<ImVec2, T>
+		static void Image(uintptr_t image, const T& size, float rotation = 0.0f) { ImageInternal((ImTextureID)image, Utils::ToImVec<ImVec2>(size), rotation); }
+		template<typename T> requires VecSized<ImVec2, T>
+		static void Image(uintptr_t image, const T& size, float rotation, const T& uv0, const T& uv1)
+		{ 
+			ImageInternal((ImTextureID)image, Utils::ToImVec<ImVec2>(size), rotation, Utils::ToImVec<ImVec2>(uv0), Utils::ToImVec<ImVec2>(uv1));
+		}
+
+		template<typename T> requires VecSized<ImVec2, T>
+		static void ImageButton(uintptr_t image, const T& size, Action<> action = {}) { ImageButtonInternal((ImTextureID)image, Utils::ToImVec<ImVec2>(size), action); }
+		template<typename T> requires VecSized<ImVec2, T>
+		static void ImageButton(uintptr_t image, const T& size, Action<> action, const T& uv0, const T& uv1, int padding = -1)
+		{
+			ImageButtonInternal((ImTextureID)image, Utils::ToImVec<ImVec2>(size), action, Utils::ToImVec<ImVec2>(uv0), Utils::ToImVec<ImVec2>(uv1), padding);
+		}
 
 		template<typename T>
 		static void AddDragDropSource(std::string_view strID, const T& data)
 		{
-			DragDropSourceInternal(strID, [&sCurrentPayload]() { sCurrentPayload = MakeSingle<Payload<T>>(data); });
+			DragDropSourceInternal(strID, [&]() { sCurrentPayload = std::make_unique<Payload<T>>(data); });
 		}
 		template<typename T>
 		static void AddDragDropTarget(std::string_view strID, Action<const T&> response)
@@ -152,8 +203,10 @@ namespace imcpp {
 		static void OnWidgetHovered(Action<> action);
 
 		static void Checkbox(std::string_view label, bool& value, Action<> action = {});
+
 		static void Button(std::string_view label, Action<> action = {});
-		static void Button(std::string_view label, const ImVec2& size, Action<> action = {});
+		template<typename T> requires VecSized<ImVec2, T>
+		static void Button(const T& size, std::string_view label, Action<> action = {}) { ButtonInternal(label, Utils::ToImVec<ImVec2>(size), action); }
 
 		template<typename T> requires std::copy_constructible<T>
 		static void Combobox(std::string_view label, std::string_view preview, T& value, std::span<const ComboEntry<T>> table)
@@ -200,16 +253,32 @@ namespace imcpp {
 			if (!comboEntry)
 				return;
 
-			onEdit(comboEntry->key, *(const T*)comboEntry->getVal());
+			onSelection(comboEntry->key, *(const T*)comboEntry->getVal());
 		}
 
 	private:
+		static void BeginChildInternal(std::string_view strID, const ImVec2& size = { 0.0f, 0.0f }, bool border = true);
+
+		static void ButtonInternal(std::string_view label, const ImVec2& size, Action<> action = {});
+
 		static int64_t ScalarEdit(std::string_view label, int64_t field);
 		static void ScalarEdit(std::string_view label, int64_t field, Action<int64_t> onEdit);
 		static uint64_t UScalarEdit(std::string_view label, uint64_t field);
 		static void UScalarEdit(std::string_view label, uint64_t field, Action<uint64_t> onEdit);
 
+		static void Vector2EditInternal(std::string_view label, ImVec2& values, float resetVal = 0.0f, float colWidth = 100.0f);
+		static void Vector3EditInternal(std::string_view label, ImVec3& values, float resetVal = 0.0f, float colWidth = 100.0f);
+		static void Vector4EditInternal(std::string_view label, ImVec4& values, float resetVal = 0.0f, float colWidth = 100.0f);
+		static void Vector2EditInternal(std::string_view label, ImVec2 values, Action<const ImVec2&> onEdit, float resetVal = 0.0f, float colWidth = 100.0f);
+		static void Vector3EditInternal(std::string_view label, ImVec3 values, Action<const ImVec3&> onEdit, float resetVal = 0.0f, float colWidth = 100.0f);
+		static void Vector4EditInternal(std::string_view label, ImVec4 values, Action<const ImVec4&> onEdit, float resetVal = 0.0f, float colWidth = 100.0f);
+
+		static void ColourEditInternal(std::string_view label, ImVec4& colour);
+
 		static void TreeNodeInternal(void* id, std::string_view text, bool selected, ImGuiTreeNodeFlags flags, Action<> whileOpen);
+
+		static void ImageInternal(ImTextureID image, const ImVec2& size, float rotation = 0.0f, const ImVec2& uv0 = { 0.0f, 0.0f }, const ImVec2& uv1 = { 1.0f, 1.0f });
+		static void ImageButtonInternal(ImTextureID image, const ImVec2& size, Action<> action = {}, const ImVec2& uv0 = { 0.0f, 0.0f }, const ImVec2& uv1 = { 1.0f, 1.0f }, int padding = -1);
 
 		static void DragDropSourceInternal(std::string_view strID, Action<> createPayload);
 		static void* DragDropTargetInternal(std::string_view strID);
