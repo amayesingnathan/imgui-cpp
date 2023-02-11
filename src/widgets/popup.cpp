@@ -9,8 +9,7 @@ namespace imcpp::ui {
 		if (!ImGui::BeginPopup(mStrID.data()))
 			return;
 
-		auto selectedPopups = mPopUpItems;// |
-			//std::views::filter([](const auto& item) { return ImGui::MenuItem(item.label.data()); });
+		auto selectedPopups = std::views::common(mPopUpItems) | std::views::filter([](const auto item) { return ImGui::MenuItem(item.label.data()); });
 
 		for (const PopUpItem& item : selectedPopups)
 		{
@@ -31,9 +30,7 @@ namespace imcpp::ui {
 		if (!ImGui::BeginPopupContextItem())
 			return;
 
-		auto selectedPopups = mPopUpItems;// |
-			//std::views::filter([](const auto& item) { return ImGui::MenuItem(item.label.data()); });
-
+		auto selectedPopups = std::views::common(mPopUpItems) | std::views::filter([](const auto item) { return ImGui::MenuItem(item.label.data()); });
 		for (const PopUpItem& item : selectedPopups)
 			item.action();
 
