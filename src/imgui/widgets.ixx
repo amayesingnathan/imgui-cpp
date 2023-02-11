@@ -200,7 +200,7 @@ export namespace imcpp {
 		}
 
 		static void OnWidgetSelected(Action<> action);
-		static void OnWidgetHovered(Action<> action);
+		static void OnWidgetHovered(Action<> action, Action<> elseAction = {});
 
 		static void Checkbox(std::string_view label, bool& value, Action<> action = {});
 

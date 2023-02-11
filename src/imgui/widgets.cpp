@@ -296,10 +296,12 @@ namespace imcpp {
 			action();
 	}
 
-	void Widgets::OnWidgetHovered(Action<> action)
+	void Widgets::OnWidgetHovered(Action<> action, Action<> elseAction)
 	{
 		if (ImGui::IsItemHovered(ImGuiHoveredFlags_RectOnly))
 			action();
+		else if (elseAction)
+			elseAction();
 	}
 
 	void Widgets::Checkbox(std::string_view label, bool& value, Action<> action)
