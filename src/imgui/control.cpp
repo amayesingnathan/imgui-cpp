@@ -43,6 +43,8 @@ namespace imcpp {
         io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
         io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
+        io.BackendFlags |= ImGuiBackendFlags_HasMouseHoveredViewport;
+
         SetDarkThemeColours();
 
         ImGuiStyle& style = ImGui::GetStyle();

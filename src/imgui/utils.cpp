@@ -6,6 +6,12 @@ module imcpp.utils;
 
 namespace imcpp {
 
+	bool Utils::IsKeyPressed(int key)
+	{
+		ImGuiIO io = ImGui::GetIO();
+		return io.KeysDown[key];
+	}
+
 	bool Utils::IsMouseDown(ImGuiMouseButton button)
 	{
 		return ImGui::IsMouseDown(button);

@@ -25,6 +25,7 @@ export namespace imcpp {
 		template<typename T, ImVecType Vec> requires VecSized<Vec, T>
 		static const T& FromImVec(const Vec& var) { return *reinterpret_cast<const T*>(&var); }
 
+		static bool IsKeyPressed(int key);
 		static bool IsMouseDown(ImGuiMouseButton button);
 		static bool IsMouseReleased(ImGuiMouseButton button);
 
