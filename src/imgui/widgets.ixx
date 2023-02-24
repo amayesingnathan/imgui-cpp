@@ -54,9 +54,9 @@ export namespace imcpp {
 			ImVec2 pos = ImGui::GetCursorPos();
 			ImVec2 tileSize = { size.x / width, size.y / height };
 
-			for (uint32_t y = 0; y < width; y++)
+			for (uint32_t y = 0; y < height; y++)
 			{
-				for (uint32_t x = 0; x < height; x++)
+				for (uint32_t x = 0; x < width; x++)
 				{
 					ImGui::SetCursorPosX(pos.x + ((float)x * tileSize.x));
 					ImGui::SetCursorPosY(pos.y + ((float)y * tileSize.y));
