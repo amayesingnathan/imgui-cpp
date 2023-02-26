@@ -20,7 +20,7 @@ export namespace imcpp {
 	{
 	public:
 		static void NewLine();
-		static void SameLine(float xOffset = 0.0f);
+		static void SameLine(float xOffset = 0.0f, float spacing = 0.0f);
 		static void Separator();
 
 		static void Disable(bool disable = true);

@@ -11,9 +11,9 @@ namespace imcpp {
 		ImGui::NewLine();
 	}
 
-	void Widgets::SameLine(float xOffset)
+	void Widgets::SameLine(float xOffset, float spacing)
 	{
-		ImGui::SameLine(xOffset);
+		ImGui::SameLine(xOffset, spacing);
 	}
 
 	void Widgets::Separator()
