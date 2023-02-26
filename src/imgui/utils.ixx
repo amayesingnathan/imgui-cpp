@@ -10,20 +10,16 @@ export namespace imcpp {
 	concept ImVecType = std::same_as<T, ImVec2> || std::same_as<T, ImVec3> || std::same_as<T, ImVec4>;
 
 	template<typename Vec, typename T>
-	concept VecSized = std::is_standard_layout_v<T> && std::is_trivially_copyable_v<T> && requires { sizeof(Vec) == sizeof(T); };
+	concept VecSized = std::is_trivially_copyable_v<T> && sizeof(Vec) == sizeof(T);
 
 	class Utils 
 	{
 	public:
 		template<ImVecType Vec, typename T> requires VecSized<Vec, T>
-		static Vec& ToImVec(T& var) { return *reinterpret_cast<Vec*>(&var); }
-		template<ImVecType Vec, typename T> requires VecSized<Vec, T>
-		static const Vec& ToImVec(const T& var) { return *reinterpret_cast<const Vec*>(&var); }
+		static Vec ToImVec(const T& var) { return std::bit_cast<Vec>(var); }
 
 		template<typename T, ImVecType Vec> requires VecSized<Vec, T>
-		static T& FromImVec(Vec& var) { return *reinterpret_cast<T*>(&var); }
-		template<typename T, ImVecType Vec> requires VecSized<Vec, T>
-		static const T& FromImVec(const Vec& var) { return *reinterpret_cast<const T*>(&var); }
+		static T FromImVec(const Vec& var) { return std::bit_cast<T>(var); }
 
 		static bool IsKeyPressed(int key);
 		static bool IsMouseDown(ImGuiMouseButton button);

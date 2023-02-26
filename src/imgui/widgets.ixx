@@ -152,11 +152,26 @@ export namespace imcpp {
 		static void DoubleEdit(std::string_view label, double field, Action<double> onEdit, float speed = 1.0f, float mix = 0.0f, float max = 0.0f);
 
 		template<typename T> requires VecSized<ImVec2, T>
-		static void Vector2Edit(std::string_view label, T& values, float resetVal = 0.0f, float colWidth = 100.0f) { Vector2EditInternal(label, Utils::ToImVec<ImVec2>(values), resetVal, colWidth); }
+		static void Vector2Edit(std::string_view label, T& values, float resetVal = 0.0f, float colWidth = 100.0f) 
+		{
+			ImVec2 imValues = Utils::ToImVec<ImVec2>(values);
+			Vector2EditInternal(label, imValues, resetVal, colWidth);
+			values = Utils::FromImVec<T>(imValues);
+		}
 		template<typename T> requires VecSized<ImVec3, T>
-		static void Vector3Edit(std::string_view label, T& values, float resetVal = 0.0f, float colWidth = 100.0f) { Vector3EditInternal(label, Utils::ToImVec<ImVec3>(values), resetVal, colWidth); }
+		static void Vector3Edit(std::string_view label, T& values, float resetVal = 0.0f, float colWidth = 100.0f) 
+		{
+			ImVec3 imValues = Utils::ToImVec<ImVec3>(values);
+			Vector3EditInternal(label, imValues, resetVal, colWidth);
+			values = Utils::FromImVec<T>(imValues);
+		}
 		template<typename T> requires VecSized<ImVec4, T>
-		static void Vector4Edit(std::string_view label, T& values, float resetVal = 0.0f, float colWidth = 100.0f) { Vector4EditInternal(label, Utils::ToImVec<ImVec4>(values), resetVal, colWidth); }
+		static void Vector4Edit(std::string_view label, T& values, float resetVal = 0.0f, float colWidth = 100.0f) 
+		{ 
+			ImVec4 imValues = Utils::ToImVec<ImVec4>(values);
+			Vector4EditInternal(label, imValues, resetVal, colWidth);
+			values = Utils::FromImVec<T>(imValues);
+		}
 		template<typename T> requires VecSized<ImVec2, T>
 		static void Vector2Edit(std::string_view label, T values, Action<const ImVec2&> onEdit, float resetVal = 0.0f, float colWidth = 100.0f) { Vector2EditInternal(label, Utils::ToImVec<ImVec2>(values), onEdit, resetVal, colWidth); }
 		template<typename T> requires VecSized<ImVec3, T>
@@ -165,7 +180,12 @@ export namespace imcpp {
 		static void Vector4Edit(std::string_view label, T values, Action<const ImVec4&> onEdit, float resetVal = 0.0f, float colWidth = 100.0f) { Vector4EditInternal(label, Utils::ToImVec<ImVec4>(values), onEdit, resetVal, colWidth); }
 
 		template<typename T> requires VecSized<ImVec4, T>
-		static void ColourEdit(std::string_view label, T& colour) { ColourEditInternal(label, Utils::ToImVec<ImVec4>(colour)); }
+		static void ColourEdit(std::string_view label, T& colour) 
+		{
+			ImVec4 imColour = Utils::ToImVec<ImVec4>(colour);
+			ColourEditInternal(label, imColour);
+			colour = Utils::FromImVec<T>(imColour);
+		}
 
 		template<typename T> requires VecSized<ImVec2, T>
 		static void Image(uintptr_t image, const T& size, float rotation = 0.0f) { ImageInternal((ImTextureID)image, Utils::ToImVec<ImVec2>(size), rotation); }
