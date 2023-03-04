@@ -22,6 +22,7 @@ export namespace imcpp {
 		static void NewLine();
 		static void SameLine(float xOffset = 0.0f, float spacing = -1.0f);
 		static void Separator();
+		static void Spacing();
 
 		static void Disable(bool disable = true);
 		static void EndDisable();
@@ -36,7 +37,7 @@ export namespace imcpp {
 		static void EndWindow();
 
 		template<typename T = ImCppVec2> requires VecSized<ImVec2, T> && requires (T a) { T(0, 0); }
-		static void BeginChild(std::string_view strID, const T& size = T(0, 0), bool border = true) { BeginChildInternal(strID, Utils::ToImVec<ImVec2>(size), border); }
+		static void BeginChild(std::string_view strID, const T& size = T(0, 0), bool border = false) { BeginChildInternal(strID, Utils::ToImVec<ImVec2>(size), border); }
 		static void EndChild();
 
 		static void BeginGroup();

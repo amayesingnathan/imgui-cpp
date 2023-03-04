@@ -21,6 +21,11 @@ namespace imcpp {
 		ImGui::Separator();
 	}
 
+	void Widgets::Spacing()
+	{
+		ImGui::Spacing();
+	}
+
 	void Widgets::Disable(bool disable)
 	{
 		ImGui::BeginDisabled(disable);
@@ -118,7 +123,7 @@ namespace imcpp {
 
 	void Widgets::BeginChildInternal(std::string_view strID, const ImVec2& size, bool border)
 	{
-		ImGui::BeginChild(strID.data(), size);
+		ImGui::BeginChild(strID.data(), size, border);
 	}
 
 	void Widgets::EndChild()
