@@ -97,7 +97,7 @@ export namespace imcpp {
 		static void LabelWrapped(std::string_view fmt);
 
 		static void StringEdit(std::string_view label, std::string& field);
-		static void PathEdit(std::string_view label, fs::path& field);
+		static void PathEdit(std::string_view label, std::filesystem::path& field);
 
 		template<typename T> requires std::signed_integral<T>
 		static void IntEdit(std::string_view label, T& field)

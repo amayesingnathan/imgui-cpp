@@ -42,8 +42,9 @@ export namespace imcpp {
 		template<typename T = ImCppVec2> requires VecSized<ImVec2, T>
 		static void SetNextWindowPos(const T& size, const T& pivot = T(0, 0), ImGuiCond cond = ImGuiCond_FirstUseEver) { SetNextWindowPosInternal(ToImVec<ImVec2>(size), ToImVec<ImVec2>(pivot), cond); }
 
-		static void SetButtonTransparent();
-		static void ResetButtonTransparency();
+		template<typename T> requires VecSized<ImVec4, T>
+		static void SetButtonColour(const T& colour) { SetButtonColourInternal(ToImVec<ImVec4>(colour)); }
+		static void SetButtonDefaults();
 
 		template<typename T = ImCppVec2> requires VecSized<ImVec2, T>
 		static T GetMainWindowCentre() { return FromImVec<T>(GetMainWindowCentreInternal()); }
@@ -81,7 +82,7 @@ export namespace imcpp {
 		static void PopStyle(int count = 1);
 
 		static void PushStyleColour(ImGuiCol flags, const ImVec4& var);
-		static void PopStyleColour();
+		static void PopStyleColour(int count = 1);
 
 	private:
 		static ImVec2 CursorPosInternal();
@@ -91,6 +92,8 @@ export namespace imcpp {
 
 		static void SetNextWindowSizeInternal(const ImVec2& size, ImGuiCond cond = ImGuiCond_FirstUseEver);
 		static void SetNextWindowPosInternal(const ImVec2& size, const ImVec2& pivot = ImVec2(0, 0), ImGuiCond cond = ImGuiCond_FirstUseEver);
+
+		static void SetButtonColourInternal(const ImVec4& colour);
 
 		static ImVec2 AvailableRegionInternal();
 		static ImVec2 AvailableRegionMinInternal();

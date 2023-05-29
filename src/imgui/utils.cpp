@@ -62,7 +62,12 @@ namespace imcpp {
 		ImGui::SetNextWindowPos(size, cond, pivot);
 	}
 
-	void Utils::SetButtonTransparent()
+	void Utils::SetButtonColourInternal(const ImVec4& colour)
+	{
+		ImGui::PushStyleColor(ImGuiCol_Button, colour);
+	}
+
+	void Utils::SetButtonDefaults()
 	{
 		auto& colours = ImGui::GetStyle().Colors;
 		const auto& buttonHovered = colours[ImGuiCol_ButtonHovered];
@@ -70,12 +75,6 @@ namespace imcpp {
 
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(buttonHovered.x, buttonHovered.y, buttonHovered.z, 0.5f));
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(buttonActive.x, buttonActive.y, buttonActive.z, 0.5f));
-		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
-	}
-
-	void Utils::ResetButtonTransparency()
-	{
-		ImGui::PopStyleColor(3);
 	}
 
 	ImVec2 Utils::GetMainWindowCentreInternal()
@@ -184,8 +183,8 @@ namespace imcpp {
 		ImGui::PushStyleColor(flags, var);
 	}
 
-	void Utils::PopStyleColour()
+	void Utils::PopStyleColour(int count)
 	{
-		ImGui::PopStyleColor();
+		ImGui::PopStyleColor(count);
 	}
 }
